@@ -1,14 +1,22 @@
+// main.go
 package main
 
 import (
-	"fmt"
+	"agwa/handlers"
 	"net/http"
+	"os"
 )
 
 func main() {
-	http.HandleFunc("/", HelloServer)
-	http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/", handlers.HomeHandler)
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
+	http.ListenAndServe(":"+getPort(), nil)
 }
-func HelloServer(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
+
+func getPort() string {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	return port
 }
